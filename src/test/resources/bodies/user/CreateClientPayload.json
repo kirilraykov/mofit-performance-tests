@@ -1,0 +1,21 @@
+{
+  "client": {
+    "birthDate": "${birthDate}",
+    "city": {
+      "cityId": "${cityId}"
+    },
+    "clientInfo": "${clientInfo}",
+    "firstName": "${firstName}",
+    "gender": "${gender}",
+    "lastName": "${lastName}",
+    "userId": "${userId}"
+  },
+  "preferredSports": [
+    {
+      "experienceLevel": "${experienceLevel}",
+      "experienceYears": "${experienceYears}",
+      "notified": "${notified}",
+      "sportId": "${sportId}"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "email": "${email}",
+  "password": "${password}",
+  "userPermissions": [
+    {
+      "accessModule": {
+        "moduleId": "${moduleId}"
+      },
+      "permission": "${permission}"
+    }
+  ]
+}
