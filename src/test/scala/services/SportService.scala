@@ -20,7 +20,7 @@ package object SportService {
            .check(status.is(200))
            .check(jsonPath("$..sportId").findRandom.saveAs("sportId"))
            .check(bodyString.saveAs("body")))
-      .exec { session => println("Random sportId: " + session("sportId").as[String]); session}
+//      .exec { session => println("Random sportId: " + session("sportId").as[String]); session}
   }
 
 }

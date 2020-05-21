@@ -3,15 +3,17 @@ package src.test.scala.generators
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+import io.gatling.core.Predef.csv
+import io.gatling.core.Predef._
+import io.gatling.http.Predef._
 import scala.util.Random
 
 object UserDataGenerators {
 
   // Test data variables for custom feeders
-  val permissions: Iterator[String] = List("READ", "WRITE", "UPDATE", "DELETE").iterator
-  val genders: Iterator[String] = List("MALE", "FEMALE").iterator
-  val experienceLevels: Iterator[String] = List("BEGINNER", "INTERMEDIATE", "ADVANCED", "PROFESSIONAL").iterator
-  var moduleId: Iterator[Int] = (1 to 3).iterator
+  val permissions = List("READ", "WRITE", "UPDATE", "DELETE")
+  val genders = List("MALE", "FEMALE")
+  val experienceLevels = List("BEGINNER", "INTERMEDIATE", "ADVANCED", "PROFESSIONAL")
   val random = new Random()
   val now: LocalDate = LocalDate.now()
   val datePattern: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -35,9 +37,8 @@ object UserDataGenerators {
   val userSignupFeeder: Iterator[Map[String, Any]] = Iterator.continually(Map(
     "email" -> getRandomEmail(),
     "password" -> "password",
-    "moduleId" -> moduleId.next(),
     "reviewScore" -> random.nextInt(100),
-    "permission" -> permissions.next()
+    "permission" -> permissions(random.nextInt(permissions.size))
     ))
 
   val createClientFeeder: Iterator[Map[String, Any]] = Iterator.continually(Map(
@@ -45,9 +46,11 @@ object UserDataGenerators {
     "clientInfo" -> ("Info for client random " + getRandomString(random.nextInt(400))),
     "firstName" -> ("Name" + getRandomString(random.nextInt(7))),
     "lastName" -> ("Name" + getRandomString(random.nextInt(7))),
-    "gender" -> genders.next(),
-    "experienceLevel" -> experienceLevels.next(),
+    "gender" -> genders(random.nextInt(genders.size)),
+    "experienceLevel" -> experienceLevels(random.nextInt(experienceLevels.size)),
     "experienceYears" -> random.nextInt(6),
     "notified" -> true
     ))
+
+  val userLoginFeeder = csv("feeders/dev/users.csv").circular
 }

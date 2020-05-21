@@ -10,6 +10,7 @@ class GetCitiesSimulation extends Simulation {
 
   val httpConf = http.baseUrl("http://localhost:8093")
     .header("Accept", "application/json")
+      .proxy(Proxy("localhost", 8888))
 
   val scn = scenario("Get all cities - Ramp up users scenario")
     .exec(getAccessModules)
@@ -25,7 +26,7 @@ class GetCitiesSimulation extends Simulation {
     scn.inject(
       nothingFor(3 seconds),
       atOnceUsers(5),
-      constantUsersPerSec(20) during(20 minutes),
+      constantUsersPerSec(5) during(20 seconds),
       ).protocols(httpConf.inferHtmlResources())
     ).maxDuration(4 minutes)
 

@@ -20,14 +20,14 @@ class SignupNewClientSimulation extends Simulation {
   def testDuration: Int = getProperty("totalDuration", "4").toInt
 
   before {
-    println(s"Ramping up users to totoal: $userCount users")
+    println(s"Ramping up users to total: $userCount users")
     println(s"Ramping users over: $rampDuration minutes")
     println(s"Total test duration: $testDuration minutes")
   }
 
   val httpConf = http.baseUrl("http://localhost:8093")
     .header("Accept", "application/json")
-//    .proxy(Proxy("localhost", 8888))
+    .proxy(Proxy("localhost", 8888))
 
   val scn = scenario("Signup new Client Scenario")
     .exec(getAccessModules)

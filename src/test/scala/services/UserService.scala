@@ -3,12 +3,13 @@ package src.test.scala
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ChainBuilder
 import io.gatling.http.Predef._
-import src.test.scala.generators.UserDataGenerators.{createClientFeeder, userSignupFeeder}
+import src.test.scala.generators.UserDataGenerators.{createClientFeeder, userSignupFeeder, userLoginFeeder}
 
 package object UserService {
 
   // Request names
   val REQ_NAME_SIGNUP_NEW_USER = "Signup new User"
+  val REQ_NAME_LOGIN_USER = "Login User"
   val REQ_NAME_SIGNUP_NEW_CLIENT = "Create client"
   val REQ_NAME_GET_ACCESS_MODULES = "Get Access modules"
   val REQ_NAME_GET_CITIES = "Get Cities"
@@ -16,6 +17,7 @@ package object UserService {
 
   // Endpoint paths
   val CREATE_USER_URL = "/users/signup"
+  val LOGIN_USER_URL = "/users/login"
   val GET_ACCESS_MODULES_URL = "/access/modules"
   val GET_CITIES_URL = "/cities"
   val CREATE_CLIENT_URL = "/clients/"
@@ -33,11 +35,12 @@ package object UserService {
       .pause(2)
   }
 
-  // TODO: Investigate if it's better to insert this in signUpUser and get random randomModuleId
   val getAccessModules: ChainBuilder = {
     exec(http(REQ_NAME_GET_ACCESS_MODULES)
             .get(GET_ACCESS_MODULES_URL)
-            .check(status.is(200)))
+            .check(status.is(200))
+           .check(jsonPath("$..moduleId").findRandom.saveAs("moduleId")))
+      .exec { session => println("Random moduleId: " + session("moduleId").as[String]); session}
       .pause(1)
   }
 
@@ -47,7 +50,7 @@ package object UserService {
            .header("Authorization", "Bearer ${jwtToken}")
            .check(status.is(200))
            .check(jsonPath("$..cityId").findRandom.saveAs("cityId")))
-      .exec { session => println("Random cityId: " + session("cityId").as[String]); session}
+//      .exec { session => println("Random cityId: " + session("cityId").as[String]); session}
       .pause(1)
   }
 
@@ -63,7 +66,7 @@ package object UserService {
               .body(ElFileBody("bodies/user/CreateClientPayload.json")).asJson
               .check(status.is(201))
               .check(bodyString.saveAs("clientId")))
-      .exec { session => println("ClientId: " + session("clientId").as[String]); session}
+//      .exec { session => println("ClientId: " + session("clientId").as[String]); session}
       .pause(2)
   }
 
@@ -77,5 +80,18 @@ package object UserService {
            .check(jsonPath("$..sportId").is("${sportId}"))
            .check(jsonPath("$..clientId").is("${clientId}")))
       .pause(1)
+  }
+
+  val loginUser: ChainBuilder = {
+    feed(userLoginFeeder)
+      .exec(http(REQ_NAME_LOGIN_USER)
+              .post(LOGIN_USER_URL)
+              .body(ElFileBody("bodies/user/LoginUserPayload.json")).asJson
+              .check(status.is(200))
+              .check(jsonPath("$.token").find.saveAs("jwtToken"))
+              .check(jsonPath("$.userId").find.saveAs("userId")))
+            .exec { session => println("Jwt token: " + session("jwtToken").as[String])
+                               println("UserId: " + session("userId").as[Int]); session}
+      .pause(2)
   }
 }
